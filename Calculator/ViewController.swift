@@ -10,16 +10,22 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    @IBOutlet private weak var sequenceOfOperations: UILabel!
     @IBOutlet private weak var display: UILabel!
     private var userIsInTheMiddleOfTyping = false
+    private var alreadyTypedPeriod = false
     @IBAction private func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         if(userIsInTheMiddleOfTyping){
             let textCurrentlyInDisplay = display.text!
-            display.text = textCurrentlyInDisplay + digit
+            if(digit == "." && !textCurrentlyInDisplay.contains(".") || digit != "."){
+                display.text = textCurrentlyInDisplay + digit
+            }
         }
         else{
-            display.text =  digit
+            if(digit != "."){
+                display.text =  digit
+            }
         }
         userIsInTheMiddleOfTyping = true
     }
@@ -39,11 +45,18 @@ class ViewController: UIViewController {
         if userIsInTheMiddleOfTyping {
             brain.setOperand(operand: displayValue)
             userIsInTheMiddleOfTyping = false
+            brain.isPartialResult = true
         }
         if let mathematicalSymbol = sender.currentTitle{
             brain.performOperation(symbol: mathematicalSymbol)
         }
         displayValue = brain.result
+        if brain.isPartialResult{
+            sequenceOfOperations.text = brain.description+" ..."
+        }
+        else{
+            sequenceOfOperations.text = brain.description+" ="
+        }
     }
 }
 
