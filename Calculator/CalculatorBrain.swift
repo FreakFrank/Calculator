@@ -28,19 +28,19 @@ class CalculatorBrain{
     }
         
     private var operations = [
-        "π" :Operation.Constant(M_PI),
-        "√" :Operation.UnaryOperation(sqrt),
+        "π"  :Operation.Constant(M_PI),
+        "√"  :Operation.UnaryOperation(sqrt),
         "cos":Operation.UnaryOperation(cos),
         "sin":Operation.UnaryOperation(sin),
-        "×" : Operation.BinaryOperation({(op1 : Double, op2 : Double) -> Double in op1*op2}),
-        "+" : Operation.BinaryOperation({(op1, op2) in op1+op2}),
-        "-" : Operation.BinaryOperation({return $0-$1}),
-        "÷" : Operation.BinaryOperation({$0/$1}),
-        "=" : Operation.Equals,
-        "C" : Operation.Clear,
-        "X²": Operation.UnaryOperation({pow($0,2)}),
-        "X³": Operation.UnaryOperation({pow($0,3)}),
-        "∛" : Operation.UnaryOperation({pow($0,(1/3))})
+        "×"  : Operation.BinaryOperation({(op1 : Double, op2 : Double) -> Double in op1*op2}),
+        "+"  : Operation.BinaryOperation({(op1, op2) in op1+op2}),
+        "-"  : Operation.BinaryOperation({return $0-$1}),
+        "÷"  : Operation.BinaryOperation({$0/$1}),
+        "="  : Operation.Equals,
+        "C"  : Operation.Clear,
+        "X²" : Operation.UnaryOperation({pow($0,2)}),
+        "X³" : Operation.UnaryOperation({pow($0,3)}),
+        "∛"  : Operation.UnaryOperation({pow($0,(1/3))})
         ]
     
     
@@ -87,6 +87,7 @@ class CalculatorBrain{
             switch operation {
             case .Constant(let value): accumulator = value
                 description += tempOperand+symbol
+                tempOperand = ""
             case .UnaryOperation(let function) :
                 print("The cuurent value of the accumulator is \(accumulator)")
                 if isPartialResult {
@@ -96,20 +97,25 @@ class CalculatorBrain{
                 else{
                     let tempDescription = description
                     description = symbol+"("+tempDescription+")"
-                accumulator = function(accumulator)
+                    accumulator = function(accumulator)
                 }
+                tempOperand = ""
                 print("The cuurent value of the description is \(description)")
 
             case .BinaryOperation(let function):
                 executePendingBinaryOperation()
                 pendingBinaryOperation = PendingBinaryOperationInfo(binaryOperation: function, firstOperand: accumulator)
                 description += tempOperand+symbol
+                tempOperand = ""
             case .Equals : executePendingBinaryOperation()
                 isPartialResult = false
+                description += tempOperand
+                tempOperand = ""
             case .Clear : accumulator = 0.0
                 pendingBinaryOperation = nil
                 description = ""
                 isPartialResult = true
+                tempOperand = ""
             }
         }
     }
